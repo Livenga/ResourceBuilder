@@ -58,8 +58,8 @@ namespace Live
       this.mfExit.Click += new EventHandler(this.onClickExitMenu);
       this.mfSave.Click += new EventHandler(this.onClickSaveMenu);
 
-      this.btnAdd.Click    += new EventHandler(this.onClickEditButton);
-      this.btnDelete.Click += new EventHandler(this.onClickEditButton);
+      this.btnAdd.Click    += new EventHandler(this.onClickAddButton);
+      this.btnDelete.Click += new EventHandler(this.onClickDeleteButton);
 
       this.cbxResourceType.SelectedIndexChanged +=
         new EventHandler(this.onChangedResourceType);
@@ -265,33 +265,19 @@ namespace Live
     // コールバックメソッド: ボタン
     //
 
-    // 追加・削除ボタン処理
+    // 追加ボタン処理
     /// <summary></summary>
-#region private void onClickEditButton(object, EventArgs)
-    private void onClickEditButton(object sender, EventArgs e)
+#region private void onClickAddButton(object, EventArgs)
+    private void onClickAddButton(object sender, EventArgs e)
     {
-      Button btn = (Button)sender;
-
-
-      // データの追加
-      if(btn == this.btnAdd) {
-      }
-
-      // データの削除
-      else if(btn == this.btnDelete) {
-
-#if _DEBUG_
-        Console.WriteLine("Type:{0}, {1}",
-            this.dataString.CurrentCell.ValueType,
-            this.dataString.CurrentCell.Value);
-
-        Console.WriteLine("{0}, {1}, {2}",
-            this.dataString.SelectedCells.Count,
-            this.dataString.SelectedColumns.Count,
-            this.dataString.SelectedRows.Count);
-#endif
-        //this.dataString.CurrentCell;
-      }
+    }
+#endregion
+    
+    // 削除ボタン処理
+    /// <summary></summary>
+#region private void onClickDeleteButton(object, EventArgs)
+    private void onClickDeleteButton(object sender, EventArgs e)
+    {
     }
 #endregion
 
