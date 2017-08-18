@@ -56,6 +56,7 @@ namespace Live.Forms
     private void DisplayResourceEditor(ResourceType type)
     {
       this.dataString.Visible = (ResourceType.Strings == type) ? true : false;
+      // = (ResourceType.Images == type) ? true : false;
     }
 #endregion
 
@@ -130,9 +131,10 @@ namespace Live.Forms
       this.DisplayResourceEditor(this.currentType);
     }
 #endregion
- 
+
     // ’Ç‰ÁEíœƒ{ƒ^ƒ“ˆ—
     /// <summary></summary>
+#region private void onClickEditButton(object, EventArgs)
     private void onClickEditButton(object sender, EventArgs e)
     {
       Button btn = (Button)sender;
@@ -158,5 +160,6 @@ namespace Live.Forms
         //this.dataString.CurrentCell;
       }
     }
+#endregion
   }
 }
