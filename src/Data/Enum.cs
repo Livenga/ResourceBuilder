@@ -10,4 +10,14 @@ namespace Live.Data
     Audios  = 3,
     Files   = 4,
   }
+
+  public enum ResourceEditMode : uint {
+    New  = 0,
+    Edit = 1,
+  }
+
+  public enum ResourceStatus : uint {
+    Saved   = 0,
+    Updated = 1,
+  }
 }
