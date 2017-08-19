@@ -7,7 +7,11 @@ SRC    = $(subst /,\,$(shell gfind src -name \*.cs))
 
 
 default:
-	$(CSC) $(DEBUG) /target:$(TARGET) /out:bin\$(PRJC).exe $(SRC)
+	$(CSC) $(DEBUG) /target:$(TARGET) /out:$(PRJC).exe $(SRC)
+
+
+release:
+	$(CSC) /target:winexe /out:bin\$(PRJC).exe $(SRC)
 
 run:
-	bin\$(PRJC).exe
+	$(PRJC).exe
