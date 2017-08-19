@@ -16,6 +16,9 @@ namespace Live
     {
       this.mainMenu = new MenuStrip();
       this.mFile    = new ToolStripMenuItem();
+      this.mTest    = new ToolStripMenuItem();
+
+
       this.mfNew    = new ToolStripMenuItem();
       this.mfOpen   = new ToolStripMenuItem();
       this.mfSave   = new ToolStripMenuItem();
@@ -48,14 +51,20 @@ namespace Live
 
       // メニュー項目
       this.mainMenu.Items.Add(this.mFile);
+      this.mainMenu.Items.Add(this.mTest);
+
       this.mFile.DropDownItems.Add(this.mfNew);
       this.mFile.DropDownItems.Add(this.mfOpen);
       this.mFile.DropDownItems.Add(new ToolStripSeparator());
       this.mFile.DropDownItems.Add(this.mfSave);
       this.mFile.DropDownItems.Add(new ToolStripSeparator());
       this.mFile.DropDownItems.Add(this.mfExit);
+      
       // File(F)
       this.mFile.Text = "&File";
+
+      // Test(T)
+      this.mTest.Text = "&Text";
 
       this.mfNew.Text          = "&New";
       this.mfNew.ShortcutKeys  = Keys.Control | Keys.N;
@@ -157,6 +166,29 @@ namespace Live
       this.mainMenu.ResumeLayout(false);
       this.mainMenu.PerformLayout();
       this.ResumeLayout(false);
+    }
+#endregion
+
+    //
+    // テストメソッド
+    //
+    /// <summary>テスト</summary>
+#region private void onClickMenuTest(object, EventArgs)
+    private void onClickMenuTest(object sender, EventArgs e)
+    {
+      // String Resource の取得
+      if(this.dataString.Rows != null) {
+        foreach(DataGridViewRow row in this.dataString.Rows) {
+          string _key, _value;
+
+          if(!row.IsNewRow) {
+            _key   = (string)row.Cells[0].Value;
+            _value = (string)row.Cells[1].Value;
+
+            Console.WriteLine("Row[{0}] -> Key:{1}, Value:{2}", row.Index, _key, _value);
+          }
+        }
+      }
     }
 #endregion
 

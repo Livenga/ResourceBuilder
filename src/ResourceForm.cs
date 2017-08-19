@@ -16,6 +16,7 @@ namespace Live
     // UI 関係
     private MenuStrip         mainMenu;
     private ToolStripMenuItem mFile, mfNew, mfOpen, mfSave, mfExit;
+    private ToolStripMenuItem mTest;
 
     private Label    lblResourceType;
     private ComboBox cbxResourceType;
@@ -53,6 +54,8 @@ namespace Live
       this.Resize += new EventHandler(
           (s, e) => { Console.WriteLine("### [D] Resize: {0}x{1}", this.Width, this.Height); });
 #endif
+
+      this.mTest.Click  += new EventHandler(onClickMenuTest);
 
       this.mfOpen.Click += new EventHandler(this.onClickOpenMenu);
       this.mfExit.Click += new EventHandler(this.onClickExitMenu);
@@ -260,6 +263,7 @@ namespace Live
       this.DisplayResourceEditor(this.currentType);
     }
 #endregion
+
 
     //
     // コールバックメソッド: ボタン
