@@ -16,8 +16,9 @@ namespace Live
     {
       this.mainMenu = new MenuStrip();
       this.mFile    = new ToolStripMenuItem();
+#if _DEBUG_
       this.mTest    = new ToolStripMenuItem();
-
+#endif
 
       this.mfNew    = new ToolStripMenuItem();
       this.mfOpen   = new ToolStripMenuItem();
@@ -33,6 +34,13 @@ namespace Live
       this.dataString = new DataGridView();
       this.dataImage  = new ListView();
       this.dataIcon   = new ListView();
+
+      this.dataImageList = new ImageList();
+      this.dataIconList  = new ImageList();
+
+      this.dataImage.LargeImageList = this.dataImageList;
+      this.dataIcon.LargeImageList  = this.dataIconList;
+
 
       this.Controls.Add(this.mainMenu);
       this.Controls.Add(this.lblResourceType);
@@ -51,7 +59,11 @@ namespace Live
 
       // メニュー項目
       this.mainMenu.Items.Add(this.mFile);
+#if _DEBUG_
+      // Test(T)
+      this.mTest.Text = "&Test";
       this.mainMenu.Items.Add(this.mTest);
+#endif
 
       this.mFile.DropDownItems.Add(this.mfNew);
       this.mFile.DropDownItems.Add(this.mfOpen);
@@ -63,8 +75,6 @@ namespace Live
       // File(F)
       this.mFile.Text = "&File";
 
-      // Test(T)
-      this.mTest.Text = "&Text";
 
       this.mfNew.Text          = "&New";
       this.mfNew.ShortcutKeys  = Keys.Control | Keys.N;
@@ -80,7 +90,7 @@ namespace Live
 
 
       // リソースタイプ
-      this.lblResourceType.Text     = "Resource &Type";
+      this.lblResourceType.Text     = "Resource Type";
       this.lblResourceType.Location = new Point(10, 35);
       this.lblResourceType.Width    = 85;
 
@@ -169,6 +179,8 @@ namespace Live
     }
 #endregion
 
+
+#if _DEBUG_
     //
     // テストメソッド
     //
@@ -176,22 +188,9 @@ namespace Live
 #region private void onClickMenuTest(object, EventArgs)
     private void onClickMenuTest(object sender, EventArgs e)
     {
-      // String Resource の取得
-      if(this.dataString.Rows != null) {
-        foreach(DataGridViewRow row in this.dataString.Rows) {
-          string _key, _value;
-
-          if(!row.IsNewRow) {
-            _key   = (string)row.Cells[0].Value;
-            _value = (string)row.Cells[1].Value;
-
-            Console.WriteLine("Row[{0}] -> Key:{1}, Value:{2}", row.Index, _key, _value);
-          }
-        }
-      }
     }
 #endregion
-
+#endif
 
     /// <summary>Dispose</summary>
 #region protected override void Dispose(bool)
