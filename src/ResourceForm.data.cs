@@ -1,3 +1,7 @@
+//
+// DataGridView ŠÖŒW‚ÌƒCƒxƒ“ƒg
+//
+
 using System;
 using System.Collections;
 using System.Drawing;

@@ -263,7 +263,17 @@ namespace Live
 
               // is ‚ÅŽ¯•Ê
               if(v is string) { // •¶Žš—ñ
-                Console.WriteLine("key:{0} is string.", key);
+                int             idx = this.dataString.Rows.Count - 1;
+                DataGridViewRow row = new DataGridViewRow();
+
+                row.Cells.Add(new DataGridViewTextBoxCell() { Value = key });
+                row.Cells.Add(new DataGridViewTextBoxCell() { Value = (string)v });
+
+                //row.Cells[0].Value = key;
+                //row.Cells[1].Value = (string)v;
+
+                this.dataString.Rows.Add(row);
+                Console.WriteLine("key:{0} is string.(value:{1})", key, (string)v);
               }
 
               else if(v is Image) { // ‰æ‘œ
