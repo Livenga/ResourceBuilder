@@ -249,8 +249,6 @@ namespace Live
         this.resourceFilePath = dialog.FileName;
         this.currentMode      = ResourceEditMode.Edit;
 
-        //Console.WriteLine("Columns count: {0}", this.dataString.ColumnCount);
-        //Console.WriteLine("Rows count: {0}", this.dataString.RowCount);
         // TODO: ここで, リソースファイルを展開する.
         try {
           using(ResXResourceSet set = new ResXResourceSet(this.resourceFilePath)) {
@@ -273,15 +271,26 @@ namespace Live
                 //row.Cells[1].Value = (string)v;
 
                 this.dataString.Rows.Add(row);
+#if _DEBUG_
                 Console.WriteLine("key:{0} is string.(value:{1})", key, (string)v);
+#endif
               }
 
+              // FIXME: Image, Icon のリソース名を格納する ListView のプロパティ ``Tag'' に絶対パスを
+              // 格納しているため, 現在のままでは不具合が生じる.
               else if(v is Image) { // 画像
+                Image _v = (Image)v;
+
+#if _DEBUG_
                 Console.WriteLine("key:{0} is Image.", key);
+                Console.WriteLine("{0} size {1}x{2}", key, _v.Width, _v.Height);
+#endif
               }
 
               else if(v is Icon) { // アイコン画像
+#if _DEBUG_
                 Console.WriteLine("key:{0} is Icon.", key);
+#endif
               }
 
             }
