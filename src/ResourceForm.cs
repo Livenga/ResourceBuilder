@@ -61,16 +61,30 @@ namespace Live
           (s, e) => { Console.WriteLine("### [D] Resize: {0}x{1}", this.Width, this.Height); });
       this.mTest.Click  += new EventHandler(onClickMenuTest);
 #endif
+      // フォームイベントを設定
+      this.Closed += new EventHandler(this.onClosedForm);
 
+      // メニューイベントを設定
       this.mfOpen.Click += new EventHandler(this.onClickOpenMenu);
       this.mfExit.Click += new EventHandler(this.onClickExitMenu);
       this.mfSave.Click += new EventHandler(this.onClickSaveMenu);
 
+      // ボタンイベントを設定
       this.btnAdd.Click    += new EventHandler(this.onClickAddButton);
       this.btnDelete.Click += new EventHandler(this.onClickDeleteButton);
 
+      // コンボボックスイベントを設定
       this.cbxResourceType.SelectedIndexChanged +=
         new EventHandler(this.onChangedResourceType);
+
+
+      //
+      // リソース関係のイベントを設定
+      //
+      this.dataString.CellValueChanged += new DataGridViewCellEventHandler(this.onChangedStringResource);
+      // NOTE: 不要の可能性があるため, コメントアウト
+      //this.dataString.RowsAdded += new DataGridViewRowsAddedEventHandler(this.onAddedStringResource);
+
 
       // UI 系(ResourceForm.design.cs に記述)
       //this.lblResourceType.Click += new EventHandler(this.onClickResourceTypeLabel);
@@ -149,6 +163,7 @@ namespace Live
           }
 
           // NOTE: ListViewItem および ImageList を参照するため, for 文を使用する.
+          
           // TODO: 現在, ListViewItemのプロパティ ``Tag'' に設定されたオブジェクトに
           // 画像のパスを格納している. そのため, 更新(未実装)を行う際に不具合が生じる.
 
@@ -189,6 +204,10 @@ namespace Live
             }
           }
         } // using(ResXResourceWriter)
+
+        this.Text          = "Resource Builder: " + this.resourceFilePath;
+        this.currentMode   = ResourceEditMode.Edit;
+        this.currentStatus = ResourceStatus.Saved;
       } // try
       catch(Exception except) {
         MessageBox.Show(
@@ -352,6 +371,7 @@ namespace Live
 
       switch(this.currentType) {
         case ResourceType.Strings:
+          // TODO: 文字列リソースの追加
           break;
 
         case ResourceType.Images:
@@ -415,6 +435,7 @@ namespace Live
                 }
               } // icon
             } // foreach(string)
+
           } // if(result)
 
           dialog.Dispose();
@@ -433,7 +454,7 @@ namespace Live
         case ResourceType.Strings:
           break;
 
-        case ResourceType.Images:
+        case ResourceType.Images: // 通常画像のリソースを削除
           if(this.dataImage.SelectedItems.Count > 0) {
             foreach(ListViewItem _item in this.dataImage.SelectedItems) {
               int _image_index = _item.ImageIndex;
@@ -444,9 +465,31 @@ namespace Live
               }
             }
           }
+          else {
+            MessageBox.Show(
+                "Image has not been selected.", "Selected image error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+          }
+
           break;
 
-        case ResourceType.Icons:
+
+        case ResourceType.Icons: // アイコン画像のリソースを削除
+          if(this.dataIcon.SelectedItems.Count > 0) {
+            foreach(ListViewItem _item in this.dataIcon.SelectedItems) {
+              int _icon_index = _item.ImageIndex;
+
+              this.dataIcon.Items.Remove(_item);
+              if(_icon_index > 0) {
+                this.dataIconList.Images.RemoveAt(_icon_index);
+              }
+            }
+          }
+          else {
+            MessageBox.Show("Icon has not been selected.", "Selected icon error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+          }
+
           break;
       }
     }
