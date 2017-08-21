@@ -241,10 +241,13 @@ namespace Live
       if(this.currentStatus == ResourceStatus.Updated) {
         result = MessageBox.Show(
             "", "",
-            MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            MessageBoxButtons.YesNoCancel, MessageBoxIcon.Information);
 
         if(result == DialogResult.Yes) {
           this.SaveResourceFile();
+        }
+        else if(result == DialogResult.Cancel) {
+          return;
         }
       }
 
