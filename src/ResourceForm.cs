@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Media;
@@ -37,6 +38,10 @@ namespace Live
     private ImageList    dataImageList;
     private ImageList    dataIconList;
 
+    //
+    private List<Image>  listImage = new List<Image>();
+    private List<Icon>   listIcon  = new List<Icon>();
+
 
     //
     private ResourceEditMode currentMode   = ResourceEditMode.New;
@@ -65,6 +70,7 @@ namespace Live
       this.Closed += new EventHandler(this.onClosedForm);
 
       // メニューイベントを設定
+      this.mfNew.Click  += new EventHandler(this.onClickNewMenu);
       this.mfOpen.Click += new EventHandler(this.onClickOpenMenu);
       this.mfExit.Click += new EventHandler(this.onClickExitMenu);
       this.mfSave.Click += new EventHandler(this.onClickSaveMenu);
@@ -154,20 +160,20 @@ namespace Live
 
               if(!row.IsNewRow) {
                 _key   = (string)row.Cells[0].Value;
-                _value = (string)row.Cells[1].Value;
 
-                writer.AddResource(_key, _value);
+                _value = (string)row.Cells[1].Value;
+                if(_value == null) {
+                  writer.AddResource(_key, "");
+                }
+                else {
+                  writer.AddResource(_key, _value);
+                }
                 //Console.WriteLine("Row[{0}] -> Key:{1}, Value:{2}", row.Index, _key, _value);
               }
             }
           }
 
-          // NOTE: ListViewItem および ImageList を参照するため, for 文を使用する.
-          
-          // TODO: 現在, ListViewItemのプロパティ ``Tag'' に設定されたオブジェクトに
-          // 画像のパスを格納している. そのため, 更新(未実装)を行う際に不具合が生じる.
-
-          // 追加済み通常画像の取得
+         // 追加済み通常画像の取得
           if(this.dataImage.Items.Count > 0) {
             for(int i = 0; i < this.dataImage.Items.Count; i++) {
               string _key;
@@ -225,15 +231,49 @@ namespace Live
     // コールバックメソッド: メニュー
     //
 
+    /// <summary>New メニュー選択</summary>
+#region private void onClickNewMenu(object, EventArgs)
+    private void onClickNewMenu(object sender, EventArgs e)
+    {
+      DialogResult result;
+
+      // TODO: 保存確認.
+      if(this.currentStatus == ResourceStatus.Updated) {
+        result = MessageBox.Show(
+            "", "",
+            MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+        if(result == DialogResult.Yes) {
+          this.SaveResourceFile();
+        }
+      }
+
+
+      this.currentMode   = ResourceEditMode.New;
+      this.currentStatus = ResourceStatus.Saved;
+
+      this.dataString.Rows.Clear();
+
+      this.dataImage.Items.Clear();
+      this.dataImageList.Images.Clear();
+      this.listImage.Clear();
+
+      this.dataIcon.Items.Clear();
+      this.dataIconList.Images.Clear();
+      this.listIcon.Clear();
+
+      System.GC.Collect();
+
+      this.Text = "Resource Builder";
+    }
+#endregion
+
     /// <summary>Open メニュー選択</summary>
 #region private void onClickOpenMenu(object, EventArgs)
     private void onClickOpenMenu(object sender, EventArgs e)
     {
       OpenFileDialog dialog;
       DialogResult   result;
-
-
-      // TODO: 現在のリソースを破棄.
 
 
       dialog = new OpenFileDialog();
@@ -246,6 +286,38 @@ namespace Live
 
       result = dialog.ShowDialog();
       if(result == DialogResult.OK) {
+        // 変更状態を保存
+        if(this.currentStatus == ResourceStatus.Updated) {
+          result = MessageBox.Show("", "",
+              MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+          if(result == DialogResult.Yes) {
+            this.SaveResourceFile();
+          }
+        }
+
+        // TODO: 現在のリソースを破棄.
+        // 文字列リソースの破棄
+        if(this.dataString.Rows.Count > 1)
+          this.dataString.Rows.Clear();
+
+        // 通常画像リソースの破棄
+        if(this.dataImage.Items.Count > 0)
+          this.dataImage.Items.Clear();
+        if(this.dataImageList.Images.Count > 0)
+          this.dataImageList.Images.Clear();
+        this.listImage.Clear();
+
+        // アイコン画像リソースの破棄
+        if(this.dataIcon.Items.Count > 0)
+          this.dataIcon.Items.Clear();
+        if(this.dataIconList.Images.Count > 0)
+          this.dataIconList.Images.Clear();
+        this.listIcon.Clear();
+
+        System.GC.Collect();
+
+
         this.resourceFilePath = dialog.FileName;
         this.currentMode      = ResourceEditMode.Edit;
 
@@ -281,6 +353,10 @@ namespace Live
               else if(v is Image) { // 画像
                 Image _v = (Image)v;
 
+                this.listImage.Add(_v);
+                this.dataImage.Items.Add(
+                    new ListViewItem(key) { ImageIndex = this.listImage.Count - 1 });
+                this.dataImageList.Images.Add(_v);
 #if _DEBUG_
                 Console.WriteLine("key:{0} is Image.", key);
                 Console.WriteLine("{0} size {1}x{2}", key, _v.Width, _v.Height);
@@ -288,6 +364,12 @@ namespace Live
               }
 
               else if(v is Icon) { // アイコン画像
+                Icon _v = (Icon)v;
+
+                this.listIcon.Add(_v);
+                this.dataIcon.Items.Add(
+                    new ListViewItem(key) { ImageIndex = this.listIcon.Count - 1 });
+                this.dataIconList.Images.Add(_v);
 #if _DEBUG_
                 Console.WriteLine("key:{0} is Icon.", key);
 #endif
@@ -425,10 +507,13 @@ namespace Live
               // 通常画像
               if(this.currentType == ResourceType.Images) {
                 try {
-                  image = Image.FromFile(path);
+                  image              = Image.FromFile(path);
+                  image.Tag          = (object)Path.GetFileName(path);
                   lsvItem.ImageIndex = this.dataImage.Items.Count;
 
                   this.dataImage.Items.Add(lsvItem);
+                  
+                  this.listImage.Add(image);
                   this.dataImageList.Images.Add(image);
                 }
                 catch(Exception except) {
@@ -441,9 +526,11 @@ namespace Live
               // アイコン画像
               else if(this.currentType == ResourceType.Icons) {
                 try {
-                  icon = new Icon(path);
+                  icon               = new Icon(path);
+                  //icon.Tag           = (object)Path.GetFileName(path);
                   lsvItem.ImageIndex = this.dataIcon.Items.Count;
 
+                  this.listIcon.Add(icon);
                   this.dataIcon.Items.Add(lsvItem);
                   this.dataIconList.Images.Add(icon);
                 }
@@ -478,6 +565,7 @@ namespace Live
             foreach(ListViewItem _item in this.dataImage.SelectedItems) {
               int _image_index = _item.ImageIndex;
 
+              this.listImage.RemoveAt(_image_index);
               this.dataImage.Items.Remove(_item);
               if(_image_index > 0) {
                 this.dataImageList.Images.RemoveAt(_image_index);
@@ -498,6 +586,7 @@ namespace Live
             foreach(ListViewItem _item in this.dataIcon.SelectedItems) {
               int _icon_index = _item.ImageIndex;
 
+              this.listIcon.RemoveAt(_icon_index);
               this.dataIcon.Items.Remove(_item);
               if(_icon_index > 0) {
                 this.dataIconList.Images.RemoveAt(_icon_index);
